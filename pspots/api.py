@@ -1,6 +1,8 @@
+import traceback
+
 from pspots import app
 from flask import jsonify, request
-from pspots.db import Parking
+from pspots.db import Parking, NewUser, User
 from pspots.helper import *
 
 @app.route("/spots", methods=['GET'])
@@ -29,13 +31,21 @@ def search():
 @app.route("/parking/reserve", methods=["POST"])
 def reserve_parking():
     """ Reserve a given `spot_id` to `user_id`"""
-    pass
+    spot_id = int(request.form['spot_id'])
+    uid = int(request.form['user_id'])
+    user = User()
+    try:
+        user.reserve(uid, spot_id)
+        return jsonify({'reserved': True, 'spot_id': spot_id})
+    except:
+        traceback.print_exc()
+        return jsonify({'reserved': False})
 
 @app.route("/my/reservations/<uid>", methods=["GET"])
 def get_my_reservations(uid):
     """ Get my existing reservations """
     user = User()
-    res = user.get_my_reservations()
+    res = user.my_reservations(uid)
     return jsonify(res)
 
 
@@ -53,9 +63,10 @@ def signup():
     """ New user sign-up """
     name = request.form['name']
     number = request.form['phnumber']
-    user = NewUser()
+    user = NewUser(name, number, 'test123')
     try:
-        user.create(name, number)
+        user.create()
     except:
-        return {'created': False}
-    return {'created': True}
+        traceback.print_exc()
+        return jsonify({'created': False})
+    return jsonify({'created': True})

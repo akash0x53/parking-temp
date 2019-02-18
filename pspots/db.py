@@ -51,16 +51,16 @@ class User:
             raise ValueError("Unauthorized user")
         self.id = res[0]
 
-    def my_reservations(self):
-        query = "SELECT *FROM parkings.spot WHERE reserved_by = %s"
+    def my_reservations(self, uid):
+        query = "SELECT *FROM spots WHERE reserved_by = %s"
         cursor = self.mysql.get_cursor()
-        cursor.execute(query, (self.id,))
+        cursor.execute(query, (uid,))
         return cursor.fetchall()
 
-    def reserve(self, spot_id):
-        query = "UPDATE parkings.spot SET reserved_by=%s WHERE id=%s AND reserved_by=0"
+    def reserve(self, spot_id, uid):
+        query = "UPDATE spots SET reserved_by=%s WHERE id=%s AND reserved_by=0"
         cursor = self.mysql.get_cursor()
-        cursor.execute(query, (self.id, spot_id))
+        cursor.execute(query, (uid, spot_id))
         return True
 
 class NewUser:
@@ -71,7 +71,7 @@ class NewUser:
 
     def create(self):
         cursor = self.mysql.get_cursor()
-        query = "INSERT INTO parking.user(name, number) VALUES(%s, %s)"
+        query = "INSERT INTO users(name, phone) VALUES(%s, %s)"
         cursor.execute(query, (self.name, self.number))
         return True
 
