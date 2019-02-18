@@ -36,6 +36,9 @@ class MySQL:
         self.__connect(**self.dbargs)
         return self.conn.cursor()
 
+    def commit(self):
+        self.conn.commit()
+
 
 class User:
     def __init__(self):
@@ -58,10 +61,11 @@ class User:
         return cursor.fetchall()
 
     def reserve(self, spot_id, uid):
-        query = "UPDATE spots SET reserved_by=%s WHERE id=%s AND reserved_by=0"
+        query = "UPDATE spots SET reserved=1, reserved_by=%s WHERE id=%s AND reserved=0"
         cursor = self.mysql.get_cursor()
-        cursor.execute(query, (uid, spot_id))
-        return True
+        res = cursor.execute(query, (uid, spot_id))
+        self.mysql.commit()
+        return bool(res)
 
 class NewUser:
     def __init__(self, name, number, passwd):
@@ -73,6 +77,7 @@ class NewUser:
         cursor = self.mysql.get_cursor()
         query = "INSERT INTO users(name, phone) VALUES(%s, %s)"
         cursor.execute(query, (self.name, self.number))
+        self.mysql.commit()
         return True
 
 

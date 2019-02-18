@@ -28,6 +28,11 @@ class TestParkingSpot(unittest.TestCase):
         res = self.client.post('/parking/reserve',
                 data={'spot_id': 1, 'user_id': 1})
         self.assertTrue(res.json.get('reserved'))
+    
+    def test_reserve_spot_failed(self):
+        res = self.client.post('/parking/reserve',
+                data={'spot_id': 12, 'user_id': 1})
+        self.assertFalse(res.json.get('reserved'))
 
     def test_view_reservations(self):
         res = self.client.get('/my/reservations/1')

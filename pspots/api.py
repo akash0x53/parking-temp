@@ -35,8 +35,8 @@ def reserve_parking():
     uid = int(request.form['user_id'])
     user = User()
     try:
-        user.reserve(uid, spot_id)
-        return jsonify({'reserved': True, 'spot_id': spot_id})
+        reserved = user.reserve(uid, spot_id)
+        return jsonify({'reserved': reserved, 'spot_id': spot_id})
     except:
         traceback.print_exc()
         return jsonify({'reserved': False})
